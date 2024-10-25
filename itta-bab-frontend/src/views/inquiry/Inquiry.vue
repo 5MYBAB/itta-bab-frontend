@@ -1,31 +1,61 @@
 <script setup>
-
 import Header from "@/App.vue";
 import PageTitleTop from "@/components/common/PageTitleTop.vue";
+import axios from "axios";
+import { useAuthStore } from "@/stores/auth.js";
+import { useRouter } from "vue-router";
+import { ref, computed } from "vue";
+
+const authStore = useAuthStore();
+const router = useRouter();
+const token = authStore.accessToken;
+// formData에 문의 내용을 저장하고, 현재 시간을 createDate에 저장
+const formData = ref({
+  inquiryContent: "",
+  createDate: new Date().toISOString()
+});
+
+const isFormValid = computed(() => {
+  return formData.value.inquiryContent.trim() !== "";
+});
+
+const handleInquiryCreate = async () => {
+  if (!isFormValid.value) return; // 폼이 유효하지 않으면 함수 종료
+  try {
+    await axios.post("http://localhost:8003/inquiry/user", formData.value, {
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    router.push("/mypage");
+  } catch (error) {
+    console.log("문의 등록 중 오류 발생: ", error);
+  }
+};
 </script>
 
 <template>
-
-  <main  class="post-detail">
-    <br>
+  <PageTitleTop />
+  <main class="post-detail">
+    <br />
     <div class="post-write-container">
       <h2>문의 하기</h2>
-      <form>
-        <div class="form-group">
-          <label for="title">문의</label>
-          <input type="text" id="title" placeholder="제목을 입력하세요" />
-        </div>
+      <!-- @submit.prevent로 폼 제출 시 새로고침 방지 -->
+      <form @submit.prevent="handleInquiryCreate">
         <div class="form-group">
           <label for="content">문의 내용</label>
-          <textarea id="content" placeholder="내용을 입력하세요"></textarea>
+          <textarea
+              id="content"
+              placeholder="내용을 입력하세요"
+              v-model="formData.inquiryContent"
+          ></textarea>
         </div>
-        <button type="submit" class="submit-button">작성 완료</button>
+        <!-- isFormValid에 따라 버튼 비활성화 -->
+        <button type="submit" class="submit-button" :disabled="!isFormValid">작성 완료</button>
       </form>
     </div>
-
-
   </main>
-
 </template>
 
 <style scoped>

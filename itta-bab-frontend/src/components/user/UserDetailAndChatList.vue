@@ -49,6 +49,9 @@ const goToDelete = () => {
   router.push('/delete-user'); // 회원정보 삭제 확인 페이지로 이동
 };
 
+const goToInquiry = () =>{
+  router.push('/inquiry')
+}
 function formatPhoneNumber(phone) {
   return phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
 }
@@ -60,7 +63,7 @@ function formatPhoneNumber(phone) {
       <img src="@/assets/icons/logo.svg">
       <div class="name">{{ username }} 회원님</div>
     </div>
-    <div class="inquiry"><input type="button" value="문의하기"></div>
+    <div class="inquiry"><input type="button" value="문의하기" @click="goToInquiry"></div>
   </div>
 
   <div class="padding">
